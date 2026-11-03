@@ -18,6 +18,8 @@ export default {
         pink: "var(--pink)",
         violet: "var(--violet)",
         danger: "var(--danger)",
+        glitch: "var(--glitch)",
+        "glitch-ink": "var(--glitch-ink)",
         "panel-dark": "var(--panel-dark)",
         "panel-text": "#EDEAFF"
       },

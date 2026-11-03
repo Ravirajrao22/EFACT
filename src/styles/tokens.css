@@ -16,6 +16,26 @@
   --white: #FFFFFF;
   --danger: #E5383B;
   --panel-dark: #1B1A2E;
+  --glitch: #EDE6D8;
+  --glitch-ink: #6B645B;
+}
+
+/* Glitch Animation */
+@keyframes glitchJitter {
+  0% { transform: translateX(0); text-shadow: none; }
+  20% { transform: translateX(-2px); text-shadow: 1px 0 #E5383B, -1px 0 #2F5BFF; }
+  40% { transform: translateX(2px); text-shadow: -1px 0 #E5383B, 1px 0 #2F5BFF; }
+  60% { transform: translateX(-1px); text-shadow: 1px 0 #E5383B; }
+  80% { transform: translateX(1px); text-shadow: -1px 0 #2F5BFF; }
+  100% { transform: translateX(0); text-shadow: none; }
+}
+
+.glitch-text:hover {
+  animation: glitchJitter 400ms ease-out;
+}
+
+.glitch-init {
+  animation: glitchJitter 450ms ease-out;
 }
 
 /* Blueprint Grid Background */
