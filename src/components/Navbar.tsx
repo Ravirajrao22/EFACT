@@ -72,18 +72,16 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
                   e.preventDefault();
                   handleLinkClick(link.href);
                 }}
-                className={`relative font-body font-semibold text-base text-ink transition-colors group py-1 ${
-                  isActive ? 'text-ink font-bold' : 'hover:text-blue'
-                }`}
+                className={`relative font-body font-semibold text-base text-ink transition-colors group py-1 ${isActive ? 'text-ink font-bold' : 'hover:text-blue'
+                  }`}
               >
                 {link.name}
                 {/* Marker underline on active / hover */}
                 <span
-                  className={`absolute left-0 bottom-0 w-full h-[4px] rounded-full transition-all duration-200 ${
-                    isActive
+                  className={`absolute left-0 bottom-0 w-full h-[4px] rounded-full transition-all duration-200 ${isActive
                       ? 'bg-lime'
                       : 'bg-yellow scale-x-0 group-hover:scale-x-100'
-                  }`}
+                    }`}
                 />
               </a>
             );
