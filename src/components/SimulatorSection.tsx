@@ -213,14 +213,14 @@ export const SimulatorSection: React.FC<SimulatorSectionProps> = ({
     playTone(480, 'sine', 0.05);
     const step = await stepGeneratorRef.current.next();
 
-    if (step.done || step.value?.isDone) {
+    const val = step.value as ExecStep | undefined;
+    if (step.done || !val || val.isDone) {
       stepGeneratorRef.current = null;
       setIsRunning(false);
       setIsPaused(false);
       setActiveLine(undefined);
       setActiveBlock(undefined);
     } else {
-      const val = step.value;
       setActiveLine(val.line);
       setActiveBlock(val.blockId);
     }
@@ -266,7 +266,8 @@ export const SimulatorSection: React.FC<SimulatorSectionProps> = ({
       const step = await stepGeneratorRef.current.next();
       setEngineTick((t) => t + 1);
 
-      if (step.done || step.value?.isDone) {
+      const val = step.value as ExecStep | undefined;
+      if (step.done || !val || val.isDone) {
         stepGeneratorRef.current = null;
         setIsRunning(false);
         setIsPaused(false);
@@ -276,7 +277,6 @@ export const SimulatorSection: React.FC<SimulatorSectionProps> = ({
         return;
       }
 
-      const val = step.value;
       setActiveLine(val.line);
       setActiveBlock(val.blockId);
 

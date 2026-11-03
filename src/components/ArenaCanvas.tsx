@@ -300,7 +300,11 @@ export const ArenaCanvas: React.FC<ArenaCanvasProps> = ({
       const bw = 30;
       const bh = 28;
       ctx.beginPath();
-      ctx.roundRect(-bw / 2, -bh / 2, bw, bh, 6);
+      if (typeof ctx.roundRect === 'function') {
+        ctx.roundRect(-bw / 2, -bh / 2, bw, bh, 6);
+      } else {
+        ctx.rect(-bw / 2, -bh / 2, bw, bh);
+      }
       ctx.fill();
       ctx.stroke();
 

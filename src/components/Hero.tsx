@@ -140,7 +140,11 @@ export const Hero: React.FC<HeroProps> = ({ onStartBuilding, onExploreBridge }) 
       ctx.strokeStyle = '#14110F';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.roundRect(-12, -10, 24, 20, 4);
+      if (typeof ctx.roundRect === 'function') {
+        ctx.roundRect(-12, -10, 24, 20, 4);
+      } else {
+        ctx.rect(-12, -10, 24, 20);
+      }
       ctx.fill();
       ctx.stroke();
 

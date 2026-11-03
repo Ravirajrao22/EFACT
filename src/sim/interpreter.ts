@@ -503,7 +503,7 @@ export class PythonInterpreter {
         }
 
         // bot.turn_left()
-        if (/^bot\.turn_left\s*\(\s*\)$/.test(text)) {
+        if (/^bot\.(turn_left|turnLeft)(\s*\(\s*\))?;?$/.test(text)) {
           this.engine.turnLeft();
           yield {
             line: node.line,
@@ -514,7 +514,7 @@ export class PythonInterpreter {
         }
 
         // bot.turn_right()
-        if (/^bot\.turn_right\s*\(\s*\)$/.test(text)) {
+        if (/^bot\.(turn_right|turnRight)(\s*\(\s*\))?;?$/.test(text)) {
           this.engine.turnRight();
           yield {
             line: node.line,
@@ -525,7 +525,7 @@ export class PythonInterpreter {
         }
 
         // bot.pick_up()
-        if (/^bot\.pick_up\s*\(\s*\)$/.test(text)) {
+        if (/^bot\.(pick_up|pickup|pickUp)(\s*\(\s*\))?;?$/.test(text)) {
           this.engine.pickUp();
           yield {
             line: node.line,
@@ -536,7 +536,7 @@ export class PythonInterpreter {
         }
 
         // bot.drop()
-        if (/^bot\.drop\s*\(\s*\)$/.test(text)) {
+        if (/^bot\.drop(\s*\(\s*\))?;?$/.test(text)) {
           this.engine.drop();
           yield {
             line: node.line,
@@ -590,10 +590,20 @@ export class PythonInterpreter {
       }
 
       case 'For': {
-        const rangeVal = Number(this.evalExpr(node.rangeExpr));
-        const limit = isNaN(rangeVal) ? 0 : Math.max(0, Math.floor(rangeVal));
+        const parts = String(node.rangeExpr || '').split(',');
+        let start = 0;
+        let limit = 0;
+        if (parts.length === 1) {
+          const val = Number(this.evalExpr(parts[0]));
+          limit = isNaN(val) ? 0 : Math.max(0, Math.floor(val));
+        } else if (parts.length >= 2) {
+          const sVal = Number(this.evalExpr(parts[0]));
+          const eVal = Number(this.evalExpr(parts[1]));
+          start = isNaN(sVal) ? 0 : Math.floor(sVal);
+          limit = isNaN(eVal) ? 0 : Math.floor(eVal);
+        }
 
-        for (let idx = 0; idx < limit; idx++) {
+        for (let idx = start; idx < limit; idx++) {
           this.variables.set(node.loopVar, idx);
           let breakLoop = false;
 
