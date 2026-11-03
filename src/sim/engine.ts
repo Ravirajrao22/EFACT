@@ -146,6 +146,23 @@ export class SimEngine {
     return isAtGoalTile && hasEnoughStars;
   }
 
+  public steps(): number {
+    return this.stats.stepsTaken;
+  }
+
+  public stars(): number {
+    return this.stats.starsCollected;
+  }
+
+  public facing(): 'N' | 'E' | 'S' | 'W' {
+    const DIR_NAMES: ('E' | 'S' | 'W' | 'N')[] = ['E', 'S', 'W', 'N'];
+    return DIR_NAMES[this.state.dir];
+  }
+
+  public position(): [number, number] {
+    return [this.state.x, this.state.y];
+  }
+
   // ACTIONS
   public stepForward(): boolean {
     if (this.state.status === 'crashed' || this.state.status === 'completed') return false;

@@ -74,7 +74,7 @@ export class PythonInterpreter {
         break; // End of current block
       }
       if (current.indent > expectedIndent) {
-        throw new Error(`Unexpected indentation at line ${current.lineNum}: "${current.text}"`);
+        throw new Error(`Line ${current.lineNum}: Unexpected indentation in "${current.text}". Hint: Align indented statements to 4 spaces.`);
       }
 
       const text = current.text;
@@ -90,23 +90,35 @@ export class PythonInterpreter {
         continue;
       }
 
-      // 1. for loop: for <var> in range(<expr>):
-      const forMatch = text.match(/^for\s+([a-zA-Z_]\w*)\s+in\s+range\((.*)\):$/);
+      // 1. for loop: for <var> in range(...) or for <var> in <iterable>:
+      const forMatch = text.match(/^for\s+([a-zA-Z_]\w*)\s+in\s+(.*):$/);
       if (forMatch) {
         const loopVar = forMatch[1];
-        const rangeExpr = forMatch[2];
+        const iterExpr = forMatch[2].trim();
         const childIndent = lines[i + 1]?.indent;
         if (childIndent === undefined || childIndent <= current.indent) {
-          throw new Error(`Expected indented block after for loop at line ${lineNum}`);
+          throw new Error(`Line ${lineNum}: Expected indented block after for loop. Hint: Indent statements inside the loop by 4 spaces.`);
         }
         const { nodes: body, nextIndex } = this.parseBlock(lines, i + 1, childIndent);
-        nodes.push({
-          type: 'For',
-          line: lineNum,
-          loopVar,
-          rangeExpr,
-          body,
-        });
+
+        const rangeMatch = iterExpr.match(/^range\((.*)\)$/);
+        if (rangeMatch) {
+          nodes.push({
+            type: 'For',
+            line: lineNum,
+            loopVar,
+            rangeExpr: rangeMatch[1],
+            body,
+          });
+        } else {
+          nodes.push({
+            type: 'ForIn',
+            line: lineNum,
+            loopVar,
+            iterExpr,
+            body,
+          });
+        }
         i = nextIndex;
         continue;
       }
@@ -117,7 +129,7 @@ export class PythonInterpreter {
         const condExpr = whileMatch[1];
         const childIndent = lines[i + 1]?.indent;
         if (childIndent === undefined || childIndent <= current.indent) {
-          throw new Error(`Expected indented block after while loop at line ${lineNum}`);
+          throw new Error(`Line ${lineNum}: Expected indented block after while loop. Hint: Indent statements inside the loop by 4 spaces.`);
         }
         const { nodes: body, nextIndex } = this.parseBlock(lines, i + 1, childIndent);
         nodes.push({
@@ -136,7 +148,7 @@ export class PythonInterpreter {
         const condExpr = ifMatch[1];
         const childIndent = lines[i + 1]?.indent;
         if (childIndent === undefined || childIndent <= current.indent) {
-          throw new Error(`Expected indented block after if statement at line ${lineNum}`);
+          throw new Error(`Line ${lineNum}: Expected indented block after if statement. Hint: Indent statements inside the if block by 4 spaces.`);
         }
         const { nodes: thenBody, nextIndex: nextAfterThen } = this.parseBlock(lines, i + 1, childIndent);
         let elseBody: ASTNode[] = [];
@@ -146,7 +158,7 @@ export class PythonInterpreter {
           if (lines[curNext].text === 'else:') {
             const elseIndent = lines[curNext + 1]?.indent;
             if (elseIndent === undefined || elseIndent <= expectedIndent) {
-              throw new Error(`Expected indented block after else at line ${lines[curNext].lineNum}`);
+              throw new Error(`Line ${lines[curNext].lineNum}: Expected indented block after else. Hint: Indent statements inside the else block by 4 spaces.`);
             }
             const elseRes = this.parseBlock(lines, curNext + 1, elseIndent);
             elseBody = elseRes.nodes;
@@ -175,7 +187,7 @@ export class PythonInterpreter {
           .filter(Boolean);
         const childIndent = lines[i + 1]?.indent;
         if (childIndent === undefined || childIndent <= current.indent) {
-          throw new Error(`Expected indented block after def ${fnName} at line ${lineNum}`);
+          throw new Error(`Line ${lineNum}: Expected indented block after def ${fnName}. Hint: Indent the function body with 4 spaces.`);
         }
         const { nodes: body, nextIndex } = this.parseBlock(lines, i + 1, childIndent);
         nodes.push({
@@ -225,7 +237,7 @@ export class PythonInterpreter {
         continue;
       }
 
-      // 7. Robot call or print call
+      // 7. Robot call, print, function call, or list append
       nodes.push({
         type: 'CallStmt',
         line: lineNum,
@@ -235,6 +247,49 @@ export class PythonInterpreter {
     }
 
     return { nodes, nextIndex: i };
+  }
+
+  // Split top-level strings by a delimiter respecting parentheses, brackets, and quotes
+  private splitTopLevel(str: string, delimiter: string = ','): string[] {
+    const results: string[] = [];
+    let current = '';
+    let parenDepth = 0;
+    let bracketDepth = 0;
+    let inQuotes: string | null = null;
+
+    for (let idx = 0; idx < str.length; idx++) {
+      const char = str[idx];
+      if (inQuotes) {
+        current += char;
+        if (char === inQuotes && str[idx - 1] !== '\\') {
+          inQuotes = null;
+        }
+      } else if (char === '"' || char === "'") {
+        inQuotes = char;
+        current += char;
+      } else if (char === '(') {
+        parenDepth++;
+        current += char;
+      } else if (char === ')') {
+        parenDepth--;
+        current += char;
+      } else if (char === '[') {
+        bracketDepth++;
+        current += char;
+      } else if (char === ']') {
+        bracketDepth--;
+        current += char;
+      } else if (char === delimiter && parenDepth === 0 && bracketDepth === 0) {
+        results.push(current);
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    if (current.length > 0) {
+      results.push(current);
+    }
+    return results;
   }
 
   // Robust Expression Evaluator with proper precedence
@@ -303,8 +358,21 @@ export class PythonInterpreter {
     for (const op of ['+', '-', '*', '/']) {
       const opIdx = this.findOperatorIndex(trimmed, op);
       if (opIdx !== -1) {
-        const left = Number(this.evalExpr(trimmed.substring(0, opIdx)));
-        const right = Number(this.evalExpr(trimmed.substring(opIdx + 1)));
+        const leftVal = this.evalExpr(trimmed.substring(0, opIdx));
+        const rightVal = this.evalExpr(trimmed.substring(opIdx + 1));
+
+        // String concatenation
+        if (op === '+' && (typeof leftVal === 'string' || typeof rightVal === 'string')) {
+          return String(leftVal) + String(rightVal);
+        }
+
+        // List concatenation
+        if (op === '+' && Array.isArray(leftVal) && Array.isArray(rightVal)) {
+          return [...leftVal, ...rightVal];
+        }
+
+        const left = Number(leftVal);
+        const right = Number(rightVal);
         switch (op) {
           case '+': return left + right;
           case '-': return left - right;
@@ -314,7 +382,54 @@ export class PythonInterpreter {
       }
     }
 
-    // 7. Base Literals and Identifiers
+    // 7. f-strings: f"..." or f'...'
+    if (
+      (trimmed.startsWith('f"') && trimmed.endsWith('"')) ||
+      (trimmed.startsWith("f'") && trimmed.endsWith("'"))
+    ) {
+      const content = trimmed.slice(2, -1);
+      return content.replace(/\{([^}]+)\}/g, (_, innerExpr) => {
+        const val = this.evalExpr(innerExpr.trim());
+        if (Array.isArray(val)) {
+          return `(${val.join(', ')})`;
+        }
+        return val !== undefined && val !== null ? String(val) : '';
+      });
+    }
+
+    // 8. List literal: [1, 2, 3]
+    if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+      const inner = trimmed.slice(1, -1).trim();
+      if (!inner) return [];
+      const parts = this.splitTopLevel(inner, ',');
+      return parts.map((p) => this.evalExpr(p.trim()));
+    }
+
+    // 9. len(...)
+    const lenMatch = trimmed.match(/^len\((.*)\)$/);
+    if (lenMatch) {
+      const val = this.evalExpr(lenMatch[1]);
+      if (Array.isArray(val) || typeof val === 'string') {
+        return val.length;
+      }
+      return 0;
+    }
+
+    // 10. List indexing: var[0] or [1,2,3][0]
+    const indexMatch = trimmed.match(/^([a-zA-Z_]\w*)\[(.*)\]$/);
+    if (indexMatch) {
+      const varName = indexMatch[1];
+      const idxExpr = indexMatch[2];
+      if (this.variables.has(varName)) {
+        const target = this.variables.get(varName);
+        const idx = Number(this.evalExpr(idxExpr));
+        if (Array.isArray(target) || typeof target === 'string') {
+          return target[idx < 0 ? target.length + idx : idx];
+        }
+      }
+    }
+
+    // 11. Base Literals
     if (trimmed === 'True') return true;
     if (trimmed === 'False') return false;
     if (trimmed === 'None') return null;
@@ -332,7 +447,7 @@ export class PythonInterpreter {
       return trimmed.slice(1, -1);
     }
 
-    // Exact Robot API queries
+    // 12. Exact Robot API queries
     if (trimmed === 'bot.wall_ahead()' || trimmed === 'bot.wall_ahead') {
       return this.engine.wall_ahead();
     }
@@ -345,8 +460,52 @@ export class PythonInterpreter {
     if (trimmed === 'bot.distance()' || trimmed === 'bot.distance') {
       return this.engine.distance();
     }
+    if (trimmed === 'bot.steps()' || trimmed === 'bot.steps') {
+      return this.engine.steps();
+    }
+    if (trimmed === 'bot.stars()' || trimmed === 'bot.stars') {
+      return this.engine.stars();
+    }
+    if (trimmed === 'bot.facing()' || trimmed === 'bot.facing') {
+      return this.engine.facing();
+    }
+    if (trimmed === 'bot.position()' || trimmed === 'bot.position') {
+      return this.engine.position();
+    }
 
-    // Variable lookup
+    // 13. Synchronous function call evaluation in expressions
+    const fnMatch = trimmed.match(/^([a-zA-Z_]\w*)\s*\((.*)\)$/);
+    if (fnMatch && this.functions.has(fnMatch[1])) {
+      const fn = this.functions.get(fnMatch[1])!;
+      const rawArgs = fnMatch[2].trim() ? this.splitTopLevel(fnMatch[2], ',') : [];
+      const evalArgs = rawArgs.map((a) => this.evalExpr(a.trim()));
+      const prevVals = new Map<string, any>();
+      for (let idx = 0; idx < fn.params.length; idx++) {
+        const pName = fn.params[idx];
+        if (this.variables.has(pName)) prevVals.set(pName, this.variables.get(pName));
+        this.variables.set(pName, evalArgs[idx]);
+      }
+      let retVal: any = null;
+      try {
+        for (const child of fn.body) {
+          if (child.type === 'Return') {
+            retVal = child.expr ? this.evalExpr(child.expr) : null;
+            break;
+          } else if (child.type === 'Assign') {
+            const v = this.evalExpr(child.expr);
+            this.variables.set(child.varName, v);
+          }
+        }
+      } finally {
+        for (const pName of fn.params) {
+          if (prevVals.has(pName)) this.variables.set(pName, prevVals.get(pName));
+          else this.variables.delete(pName);
+        }
+      }
+      return retVal;
+    }
+
+    // 14. Variable lookup
     if (this.variables.has(trimmed)) {
       return this.variables.get(trimmed);
     }
@@ -354,16 +513,30 @@ export class PythonInterpreter {
     return trimmed;
   }
 
-  // Helper to find top-level operators not enclosed in parentheses
+  // Helper to find top-level operators not enclosed in parentheses, brackets, or quotes
   private findOperatorIndex(str: string, op: string): number {
-    let depth = 0;
+    let parenDepth = 0;
+    let bracketDepth = 0;
+    let inQuotes: string | null = null;
     const isWord = op === 'and' || op === 'or';
 
     for (let i = 0; i <= str.length - op.length; i++) {
       const ch = str[i];
-      if (ch === '(') depth++;
-      else if (ch === ')') depth--;
-      else if (depth === 0) {
+      if (inQuotes) {
+        if (ch === inQuotes && str[i - 1] !== '\\') {
+          inQuotes = null;
+        }
+        continue;
+      }
+      if (ch === '"' || ch === "'") {
+        inQuotes = ch;
+        continue;
+      }
+      if (ch === '(') parenDepth++;
+      else if (ch === ')') parenDepth--;
+      else if (ch === '[') bracketDepth++;
+      else if (ch === ']') bracketDepth--;
+      else if (parenDepth === 0 && bracketDepth === 0) {
         if (str.substring(i, i + op.length) === op) {
           if (isWord) {
             const before = i > 0 ? str[i - 1] : ' ';
@@ -405,7 +578,7 @@ export class PythonInterpreter {
   ): AsyncGenerator<ExecStep, { signal?: 'break' | 'continue' | 'return'; val?: any }, void> {
     this.stepCount++;
     if (this.stepCount > this.maxSteps) {
-      const errMsg = 'Your loop never ended. Add a condition that can become False.';
+      const errMsg = `Line ${node.line}: Loop cap exceeded 5,000 steps without ending. Hint: Add a condition that terminates your loop (e.g., bot.wall_ahead() or bot.at_goal()).`;
       this.engine.state.lastError = errMsg;
       this.engine.onLogMessage?.(errMsg, 'error');
       yield {
@@ -431,11 +604,47 @@ export class PythonInterpreter {
 
       case 'Return': {
         const val = node.expr ? this.evalExpr(node.expr) : undefined;
-        yield { line: node.line, blockId: this.lineToBlock[node.line] };
+        yield { line: node.line, blockId: this.lineToBlock[node.line], actionDesc: `return ${val}` };
         return { signal: 'return', val };
       }
 
       case 'Assign': {
+        // If assigning from a user function that might invoke bot actions:
+        const fnMatch = node.expr.trim().match(/^([a-zA-Z_]\w*)\s*\((.*)\)$/);
+        if (fnMatch && this.functions.has(fnMatch[1])) {
+          const fn = this.functions.get(fnMatch[1])!;
+          const rawArgs = fnMatch[2].trim() ? this.splitTopLevel(fnMatch[2], ',') : [];
+          const evalArgs = rawArgs.map((a) => this.evalExpr(a.trim()));
+          const prevVals = new Map<string, any>();
+          for (let idx = 0; idx < fn.params.length; idx++) {
+            const pName = fn.params[idx];
+            if (this.variables.has(pName)) prevVals.set(pName, this.variables.get(pName));
+            this.variables.set(pName, evalArgs[idx]);
+          }
+          let returnVal: any = null;
+          try {
+            for (const child of fn.body) {
+              const res = yield* this.executeNode(child);
+              if (res?.signal === 'return') {
+                returnVal = res.val;
+                break;
+              }
+            }
+          } finally {
+            for (const pName of fn.params) {
+              if (prevVals.has(pName)) this.variables.set(pName, prevVals.get(pName));
+              else this.variables.delete(pName);
+            }
+          }
+          this.variables.set(node.varName, returnVal);
+          yield {
+            line: node.line,
+            blockId: this.lineToBlock[node.line],
+            actionDesc: `${node.varName} = ${returnVal}`,
+          };
+          return {};
+        }
+
         const rVal = this.evalExpr(node.expr);
         const cur = this.variables.get(node.varName) ?? 0;
         if (node.op === '=') {
@@ -468,7 +677,8 @@ export class PythonInterpreter {
         const fwdMatch = text.match(/^bot\.forward\s*\((.*)\)$/);
         if (fwdMatch) {
           const arg = fwdMatch[1].trim();
-          const count = arg ? Math.max(1, Number(this.evalExpr(arg)) || 1) : 1;
+          const countVal = arg ? Number(this.evalExpr(arg)) : 1;
+          const count = Math.max(1, isNaN(countVal) ? 1 : Math.floor(countVal));
           for (let s = 0; s < count; s++) {
             const ok = this.engine.stepForward();
             yield {
@@ -487,7 +697,8 @@ export class PythonInterpreter {
         const bwdMatch = text.match(/^bot\.backward\s*\((.*)\)$/);
         if (bwdMatch) {
           const arg = bwdMatch[1].trim();
-          const count = arg ? Math.max(1, Number(this.evalExpr(arg)) || 1) : 1;
+          const countVal = arg ? Number(this.evalExpr(arg)) : 1;
+          const count = Math.max(1, isNaN(countVal) ? 1 : Math.floor(countVal));
           for (let s = 0; s < count; s++) {
             const ok = this.engine.stepBackward();
             yield {
@@ -550,11 +761,12 @@ export class PythonInterpreter {
         const sayMatch = text.match(/^bot\.say\s*\((.*)\)$/);
         if (sayMatch) {
           const msg = this.evalExpr(sayMatch[1]);
-          this.engine.say(String(msg));
+          const outText = Array.isArray(msg) ? `(${msg.join(', ')})` : String(msg);
+          this.engine.say(outText);
           yield {
             line: node.line,
             blockId: this.lineToBlock[node.line],
-            actionDesc: `bot.say: ${msg}`,
+            actionDesc: `bot.say: ${outText}`,
           };
           return {};
         }
@@ -562,28 +774,77 @@ export class PythonInterpreter {
         // print(...)
         const printMatch = text.match(/^print\s*\((.*)\)$/);
         if (printMatch) {
-          const msg = this.evalExpr(printMatch[1]);
-          this.engine.say(String(msg));
+          const rawArgs = printMatch[1].trim() ? this.splitTopLevel(printMatch[1], ',') : [];
+          const evaluated = rawArgs.map((a) => {
+            const v = this.evalExpr(a.trim());
+            return Array.isArray(v) ? `(${v.join(', ')})` : String(v);
+          });
+          const outText = evaluated.join(' ');
+          this.engine.say(outText);
           yield {
             line: node.line,
             blockId: this.lineToBlock[node.line],
-            actionDesc: `print: ${msg}`,
+            actionDesc: `print: ${outText}`,
           };
           return {};
         }
 
-        // User defined function call
+        // list.append(item)
+        const appendMatch = text.match(/^([a-zA-Z_]\w*)\.append\s*\((.*)\)$/);
+        if (appendMatch) {
+          const varName = appendMatch[1];
+          const itemVal = this.evalExpr(appendMatch[2].trim());
+          if (this.variables.has(varName)) {
+            const list = this.variables.get(varName);
+            if (Array.isArray(list)) {
+              list.push(itemVal);
+              yield {
+                line: node.line,
+                blockId: this.lineToBlock[node.line],
+                actionDesc: `${varName}.append(${JSON.stringify(itemVal)})`,
+              };
+              return {};
+            }
+          }
+        }
+
+        // User defined function call with parameters
         const fnCallMatch = text.match(/^([a-zA-Z_]\w*)\s*\((.*)\)$/);
-        if (fnCallMatch) {
+        if (fnCallMatch && this.functions.has(fnCallMatch[1])) {
           const fnName = fnCallMatch[1];
-          if (this.functions.has(fnName)) {
-            const fn = this.functions.get(fnName)!;
+          const fn = this.functions.get(fnName)!;
+          const rawArgs = fnCallMatch[2].trim() ? this.splitTopLevel(fnCallMatch[2], ',') : [];
+          const evalArgs = rawArgs.map((a) => this.evalExpr(a.trim()));
+
+          // Save parameter scope
+          const prevVals = new Map<string, any>();
+          for (let idx = 0; idx < fn.params.length; idx++) {
+            const pName = fn.params[idx];
+            if (this.variables.has(pName)) {
+              prevVals.set(pName, this.variables.get(pName));
+            }
+            this.variables.set(pName, evalArgs[idx]);
+          }
+
+          try {
             for (const child of fn.body) {
               const res = yield* this.executeNode(child);
               if (res?.signal === 'return') break;
+              if (res?.signal === 'break' || res?.signal === 'continue') return res;
+              if (this.engine.state.status === 'crashed' || this.engine.state.status === 'completed') {
+                return {};
+              }
             }
-            return {};
+          } finally {
+            for (const pName of fn.params) {
+              if (prevVals.has(pName)) {
+                this.variables.set(pName, prevVals.get(pName));
+              } else {
+                this.variables.delete(pName);
+              }
+            }
           }
+          return {};
         }
 
         return {};
@@ -611,6 +872,41 @@ export class PythonInterpreter {
             line: node.line,
             blockId: this.lineToBlock[node.line],
             actionDesc: `for ${node.loopVar} = ${idx}`,
+          };
+
+          for (const child of node.body) {
+            const res = yield* this.executeNode(child);
+            if (res?.signal === 'break') {
+              breakLoop = true;
+              break;
+            }
+            if (res?.signal === 'continue') {
+              break;
+            }
+            if (res?.signal === 'return') {
+              return res;
+            }
+            if (this.engine.state.status === 'crashed' || this.engine.state.status === 'completed') {
+              return {};
+            }
+          }
+          if (breakLoop) break;
+        }
+        return {};
+      }
+
+      case 'ForIn': {
+        const iterable = this.evalExpr(node.iterExpr);
+        const list = Array.isArray(iterable) ? iterable : [];
+
+        for (const item of list) {
+          this.variables.set(node.loopVar, item);
+          let breakLoop = false;
+
+          yield {
+            line: node.line,
+            blockId: this.lineToBlock[node.line],
+            actionDesc: `for ${node.loopVar} = ${JSON.stringify(item)}`,
           };
 
           for (const child of node.body) {

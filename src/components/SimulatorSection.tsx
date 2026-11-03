@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { SimEngine } from '../sim/engine';
 import { LEVELS, LevelData } from '../sim/levels';
-import { generatePython } from '../sim/codegen';
+import { generatePython, pythonToBlocks } from '../sim/codegen';
 import { PythonInterpreter, ExecStep } from '../sim/interpreter';
 import { ArenaCanvas } from './ArenaCanvas';
 import { BlocksPanel } from './BlocksPanel';
@@ -316,6 +316,26 @@ export const SimulatorSection: React.FC<SimulatorSectionProps> = ({
     setTimeout(() => setShareToast(null), 3000);
   };
 
+  // Convert Python code back to blocks (U4)
+  const handleShowAsBlocks = () => {
+    const res = pythonToBlocks(pythonCode);
+    if ('blocks' in res && res.success) {
+      setBlocks(res.blocks);
+      setMode('blocks');
+      logMessage('Code converted into visual blocks.', 'info');
+    } else if ('reason' in res) {
+      logMessage(res.reason, 'info');
+    }
+  };
+
+  // Load starter snippet (U1)
+  const handleSelectSnippet = (snippetCode: string) => {
+    setMode('python');
+    setPythonCode(snippetCode);
+    handleReset();
+    logMessage('Loaded starter snippet into editor.', 'info');
+  };
+
   return (
     <section id="playground" className="py-12 md:py-16 px-4 md:px-8 max-w-[1320px] mx-auto">
       {/* Section Header */}
@@ -563,6 +583,7 @@ export const SimulatorSection: React.FC<SimulatorSectionProps> = ({
               mode={mode}
               code={pythonCode}
               onChangeCode={setPythonCode}
+              onSwitchMode={setMode}
               hoveredLineNumber={hoveredLineNumber}
               onHoverLine={setHoveredLineNumber}
               activeLineNumber={activeLine}
@@ -570,6 +591,10 @@ export const SimulatorSection: React.FC<SimulatorSectionProps> = ({
               logs={logs}
               onClearLogs={() => setLogs([])}
               blockCount={codegenResult.totalBlockCount}
+              stepsTaken={engineRef.current.stats.stepsTaken}
+              starsCollected={engineRef.current.stats.starsCollected}
+              onShowAsBlocks={handleShowAsBlocks}
+              onSelectSnippet={handleSelectSnippet}
             />
           </div>
         </div>
