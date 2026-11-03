@@ -25,7 +25,7 @@ export const Footer: React.FC = () => {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-white border-2 border-paper shadow-[3px_3px_0_#FFF8EC] flex items-center justify-center p-0.5 overflow-hidden">
                 <img
-                  src="/logo.png"
+                  src="./logo.png"
                   alt="EFACT Robotics Logo"
                   className="w-full h-full object-contain"
                 />

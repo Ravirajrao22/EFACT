@@ -45,7 +45,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
         >
           <div className="w-10 h-10 rounded-xl bg-white border-ink-2 shadow-hard-sm flex items-center justify-center p-0.5 overflow-hidden group-hover:scale-105 transition-transform">
             <img
-              src="/logo.png"
+              src="./logo.png"
               alt="EFACT Robotics Logo"
               className="w-full h-full object-contain"
             />
