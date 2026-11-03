@@ -1,0 +1,44 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        paper: "var(--paper)",
+        "paper-2": "var(--paper-2)",
+        ink: "var(--ink)",
+        "ink-soft": "var(--ink-soft)",
+        blue: "var(--blue)",
+        orange: "var(--orange)",
+        lime: "var(--lime)",
+        yellow: "var(--yellow)",
+        pink: "var(--pink)",
+        violet: "var(--violet)",
+        danger: "var(--danger)",
+        "panel-dark": "var(--panel-dark)",
+        "panel-text": "#EDEAFF"
+      },
+      fontFamily: {
+        heading: ["'Bricolage Grotesque'", "sans-serif"],
+        body: ["'DM Sans'", "sans-serif"],
+        mono: ["'JetBrains Mono'", "monospace"],
+      },
+      boxShadow: {
+        hard: "5px 5px 0 var(--ink)",
+        "hard-sm": "3px 3px 0 var(--ink)",
+        "hard-lg": "8px 8px 0 var(--ink)",
+        "hard-xl": "10px 10px 0 var(--ink)",
+        "hard-hover": "7px 7px 0 var(--ink)",
+        "hard-active": "1px 1px 0 var(--ink)",
+      },
+      borderWidth: {
+        ink: "2.5px",
+      }
+    },
+  },
+  plugins: [],
+}
+
