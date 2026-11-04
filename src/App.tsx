@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
+import { WhatHappensAtRIG } from './components/WhatHappensAtRIG';
 import { SimulatorSection } from './components/SimulatorSection';
 import { HowItWorks } from './components/HowItWorks';
 import { AttentionSpan } from './components/AttentionSpan';
@@ -101,9 +102,12 @@ export const App: React.FC = () => {
       <main className="flex-1">
         {/* Hero Section */}
         <Hero
-          onStartBuilding={() => scrollToElement('playground')}
-          onExploreBridge={() => scrollToElement('how-it-works')}
+          onStartBuilding={() => scrollToElement('schools')}
+          onExploreBridge={() => scrollToElement('what-happens-at-rig')}
         />
+
+        {/* What Happens at RIG Section */}
+        <WhatHappensAtRIG />
 
         {/* The Working Simulator Playground (Core feature) */}
         <SimulatorSection

@@ -24,6 +24,8 @@ export const MakerPath: React.FC<MakerPathProps> = ({ completedCount }) => {
     },
     {
       level: 2,
+      id: 'algorithmic-foundations',
+      trackName: 'Algorithmic Foundations',
       name: 'Tinkerer',
       badgeColor: 'bg-yellow text-ink',
       borderColor: 'border-ink',
@@ -33,6 +35,8 @@ export const MakerPath: React.FC<MakerPathProps> = ({ completedCount }) => {
     },
     {
       level: 3,
+      id: 'applied-syntax-bridge',
+      trackName: 'Applied Syntax Bridge',
       name: 'Coder',
       badgeColor: 'bg-violet text-white',
       borderColor: 'border-ink',
@@ -42,6 +46,8 @@ export const MakerPath: React.FC<MakerPathProps> = ({ completedCount }) => {
     },
     {
       level: 4,
+      id: 'autonomous-engineering',
+      trackName: 'Autonomous Engineering',
       name: 'Maker',
       badgeColor: 'bg-orange text-white',
       borderColor: 'border-ink',
@@ -80,7 +86,8 @@ export const MakerPath: React.FC<MakerPathProps> = ({ completedCount }) => {
             return (
               <div
                 key={st.level}
-                className={`bg-paper border-ink-2 rounded-2xl p-6 shadow-hard flex flex-col justify-between transition-all ${
+                id={st.id}
+                className={`bg-paper border-ink-2 rounded-2xl p-6 shadow-hard flex flex-col justify-between transition-all scroll-mt-24 ${
                   isCurrent ? 'ring-4 ring-blue ring-offset-2 scale-[1.03] shadow-hard-lg' : ''
                 }`}
               >
@@ -105,9 +112,14 @@ export const MakerPath: React.FC<MakerPathProps> = ({ completedCount }) => {
                     {st.icon}
                   </div>
 
-                  <h3 className="font-heading font-extrabold text-2xl text-ink mb-2">
+                  <h3 className="font-heading font-extrabold text-2xl text-ink mb-1">
                     {st.name}
                   </h3>
+                  {st.trackName && (
+                    <div className="font-mono text-xs text-blue font-bold mb-2">
+                      {st.trackName}
+                    </div>
+                  )}
                   <p className="font-body text-ink-soft text-sm leading-relaxed mb-6">
                     {st.desc}
                   </p>
