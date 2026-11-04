@@ -15,7 +15,7 @@ export const IMAGES: Record<string, ImageManifestEntry> = {
     caption: 'Students building in a workshop',
     tag: 'WORKSHOP',
     ratio: '4/3',
-    src: null,
+    src: 'images/hero-a.jpg',
   },
   'hero-b': {
     id: 'hero-b',
@@ -23,7 +23,7 @@ export const IMAGES: Record<string, ImageManifestEntry> = {
     caption: 'Student project on display',
     tag: 'STUDENT PROJECT',
     ratio: '3/4',
-    src: null,
+    src: 'images/hero-b.jpg',
   },
   'hero-c': {
     id: 'hero-c',
@@ -31,7 +31,7 @@ export const IMAGES: Record<string, ImageManifestEntry> = {
     caption: 'School event or competition',
     tag: 'EVENT',
     ratio: '3/4',
-    src: null,
+    src: 'images/hero-c.jpg',
   },
   'hero-d': {
     id: 'hero-d',
@@ -39,7 +39,7 @@ export const IMAGES: Record<string, ImageManifestEntry> = {
     caption: 'Teacher training session',
     tag: 'TEACHER TRAINING',
     ratio: '3/1',
-    src: null,
+    src: 'images/hero-d.jpg',
   },
 
   // In action: Workshops
@@ -49,7 +49,7 @@ export const IMAGES: Record<string, ImageManifestEntry> = {
     caption: 'Hands-on builds with boards, sensors and motors',
     tag: 'WORKSHOP',
     ratio: '3/2',
-    src: null,
+    src: 'images/workshop-1.jpg',
   },
   'workshop-2': {
     id: 'workshop-2',
@@ -57,7 +57,7 @@ export const IMAGES: Record<string, ImageManifestEntry> = {
     caption: 'From a circuit idea to a working board',
     tag: 'WORKSHOP',
     ratio: '3/2',
-    src: null,
+    src: 'images/workshop-2.jpg',
   },
   'workshop-3': {
     id: 'workshop-3',
@@ -65,7 +65,7 @@ export const IMAGES: Record<string, ImageManifestEntry> = {
     caption: 'Design it, print it, test it',
     tag: 'WORKSHOP',
     ratio: '3/2',
-    src: null,
+    src: 'images/workshop-3.jpg',
   },
 
   // In action: Events
@@ -75,7 +75,7 @@ export const IMAGES: Record<string, ImageManifestEntry> = {
     caption: 'Inter-school technology challenge',
     tag: 'EVENT',
     ratio: '3/2',
-    src: null,
+    src: 'images/event-1.jpg',
   },
   'event-2': {
     id: 'event-2',
@@ -83,7 +83,7 @@ export const IMAGES: Record<string, ImageManifestEntry> = {
     caption: 'School-level robotics showcase',
     tag: 'EVENT',
     ratio: '3/2',
-    src: null,
+    src: 'images/event-2.jpg',
   },
   'event-3': {
     id: 'event-3',
@@ -91,7 +91,7 @@ export const IMAGES: Record<string, ImageManifestEntry> = {
     caption: 'National competition mentoring',
     tag: 'EVENT',
     ratio: '3/2',
-    src: null,
+    src: 'images/event-3.jpg',
   },
 
   // In action: Student Projects
@@ -101,7 +101,7 @@ export const IMAGES: Record<string, ImageManifestEntry> = {
     caption: 'Autonomous Line-Following Bot (Sample)',
     tag: 'STUDENT PROJECT',
     ratio: '3/2',
-    src: null,
+    src: 'images/project-1.jpg',
   },
   'project-2': {
     id: 'project-2',
@@ -109,7 +109,7 @@ export const IMAGES: Record<string, ImageManifestEntry> = {
     caption: 'Smart Classroom Sensor Project (Sample)',
     tag: 'STUDENT PROJECT',
     ratio: '3/2',
-    src: null,
+    src: 'images/project-2.jpg',
   },
   'project-3': {
     id: 'project-3',
@@ -117,7 +117,7 @@ export const IMAGES: Record<string, ImageManifestEntry> = {
     caption: 'App built by Class 9 students (Sample)',
     tag: 'STUDENT PROJECT',
     ratio: '3/2',
-    src: null,
+    src: 'images/project-3.jpg',
   },
 
   // Training
@@ -127,7 +127,7 @@ export const IMAGES: Record<string, ImageManifestEntry> = {
     caption: 'Teacher professional development workshop',
     tag: 'TEACHER TRAINING',
     ratio: '16/9',
-    src: null,
+    src: 'images/training-1.jpg',
   },
 
   // Validated institutions
@@ -137,7 +137,7 @@ export const IMAGES: Record<string, ImageManifestEntry> = {
     caption: 'Lovely Professional University',
     tag: 'VALIDATION',
     ratio: '16/9',
-    src: null,
+    src: 'images/lpu.jpg',
   },
   'dps': {
     id: 'dps',
@@ -145,7 +145,6 @@ export const IMAGES: Record<string, ImageManifestEntry> = {
     caption: 'Delhi Public School, Jalandhar',
     tag: 'VALIDATION',
     ratio: '16/9',
-    src: null,
+    src: 'images/dps.jpg',
   },
 };
-

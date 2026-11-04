@@ -32,10 +32,19 @@ export const PhotoSlot: React.FC<PhotoSlotProps> = ({
 
   // Real Image is present
   if (item.src) {
+    const resolveSrc = (path: string) => {
+      if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+        return path;
+      }
+      const cleanPath = path.replace(/^\.?\//, '');
+      const baseUrl = import.meta.env.BASE_URL.replace(/\/$/, '');
+      return baseUrl ? `${baseUrl}/${cleanPath}` : cleanPath;
+    };
+
     return (
       <div className={`relative w-full h-full overflow-hidden bg-[#EAE2D2] select-none ${className}`}>
         <img
-          src={item.src}
+          src={resolveSrc(item.src)}
           alt={item.alt}
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
