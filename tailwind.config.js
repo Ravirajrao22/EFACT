@@ -29,11 +29,11 @@ export default {
         mono: ["'JetBrains Mono'", "monospace"],
       },
       boxShadow: {
-        hard: "5px 5px 0 var(--ink)",
-        "hard-sm": "3px 3px 0 var(--ink)",
-        "hard-lg": "8px 8px 0 var(--ink)",
-        "hard-xl": "10px 10px 0 var(--ink)",
-        "hard-hover": "7px 7px 0 var(--ink)",
+        hard: "4px 4px 0 var(--ink)",
+        "hard-sm": "2.5px 2.5px 0 var(--ink)",
+        "hard-lg": "6px 6px 0 var(--ink)",
+        "hard-xl": "8px 8px 0 var(--ink)",
+        "hard-hover": "6px 6px 0 var(--ink)",
         "hard-active": "1px 1px 0 var(--ink)",
       },
       borderWidth: {

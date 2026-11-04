@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowUp, Instagram, Linkedin, Youtube, Mail, Phone, MapPin } from 'lucide-react';
+import { EMAIL_ADDRESS, PHONE_NUMBER } from '../config';
 
 export const Footer: React.FC = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -17,7 +18,7 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-ink text-paper pt-16 pb-8 px-4 md:px-8 border-t-ink-2 relative">
+    <footer className="bg-ink text-paper pt-16 pb-12 px-4 md:px-8 border-t-2 border-ink relative">
       <div className="max-w-[1240px] mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-12 border-b border-paper/15">
           {/* Column 1: Logo & Tagline (4 cols) */}
@@ -40,8 +41,11 @@ export const Footer: React.FC = () => {
               </div>
             </div>
 
-            <p className="font-mono text-sm text-[#D8CEBC]">
-              Making makers, one robot at a time.
+            <p className="font-mono text-sm text-lime font-bold">
+              Making Every Effect Count.
+            </p>
+            <p className="font-body text-sm text-[#D8CEBC] max-w-sm">
+              Structured coding and robotics programmes for K-12 schools, institutions, and aspiring young engineers.
             </p>
 
             {/* Social Icons */}
@@ -76,30 +80,30 @@ export const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Column 2: Explore (2 cols) */}
+          {/* Column 2: Explore (3 cols) */}
           <div className="lg:col-span-3 space-y-3">
             <h4 className="font-mono text-xs font-bold text-yellow uppercase tracking-wider">
-              Explore Platform
+              Explore
             </h4>
-            <ul className="space-y-2 font-body text-sm text-[#D8CEBC]">
+            <ul className="space-y-2.5 font-body text-sm text-[#D8CEBC]">
               <li>
-                <a href="#playground" className="hover:text-lime transition-colors">
-                  Simulator Playground
+                <a href="#why" className="hover:text-lime transition-colors">
+                  Why EFACT
                 </a>
               </li>
               <li>
-                <a href="#how-it-works" className="hover:text-lime transition-colors">
-                  How It Works (The Bridge)
+                <a href="#offerings" className="hover:text-lime transition-colors">
+                  What we bring
                 </a>
               </li>
               <li>
-                <a href="#missions" className="hover:text-lime transition-colors">
-                  Mission Board
+                <a href="#in-action" className="hover:text-lime transition-colors">
+                  In action
                 </a>
               </li>
               <li>
-                <a href="#maker-path" className="hover:text-lime transition-colors">
-                  The Maker Path
+                <a href="#programme" className="hover:text-lime transition-colors">
+                  Programme
                 </a>
               </li>
             </ul>
@@ -110,10 +114,10 @@ export const Footer: React.FC = () => {
             <h4 className="font-mono text-xs font-bold text-yellow uppercase tracking-wider">
               For Schools
             </h4>
-            <ul className="space-y-2 font-body text-sm text-[#D8CEBC]">
+            <ul className="space-y-2.5 font-body text-sm text-[#D8CEBC]">
               <li>
                 <a href="#schools" className="hover:text-lime transition-colors">
-                  Request a Demo
+                  Book a Pilot
                 </a>
               </li>
               <li>
@@ -123,12 +127,12 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <a href="#schools" className="hover:text-lime transition-colors">
-                  Hardware Workshops
+                  Teacher Training
                 </a>
               </li>
               <li>
-                <a href="#schools" className="hover:text-lime transition-colors">
-                  Teacher Support
+                <a href="#support" className="hover:text-lime transition-colors">
+                  Lab Setup &amp; Support
                 </a>
               </li>
             </ul>
@@ -137,17 +141,19 @@ export const Footer: React.FC = () => {
           {/* Column 4: Contact (3 cols) */}
           <div className="lg:col-span-3 space-y-3 font-mono text-xs text-[#D8CEBC]">
             <h4 className="font-mono text-xs font-bold text-yellow uppercase tracking-wider">
-              Headquarters
+              Get in Touch
             </h4>
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-lime shrink-0" />
-              <a href="mailto:hello@efactrobotics.com" className="hover:underline">
-                hello@efactrobotics.com
+              <a href={`mailto:${EMAIL_ADDRESS}`} className="hover:underline hover:text-white">
+                {EMAIL_ADDRESS}
               </a>
             </div>
             <div className="flex items-center gap-2">
               <Phone className="w-4 h-4 text-lime shrink-0" />
-              <span>+91 (800) 123-ROBOT</span>
+              <a href={`tel:${PHONE_NUMBER.replace(/\s+/g, '')}`} className="hover:underline hover:text-white font-bold">
+                {PHONE_NUMBER}
+              </a>
             </div>
             <div className="flex items-start gap-2">
               <MapPin className="w-4 h-4 text-lime shrink-0 mt-0.5" />
@@ -186,4 +192,3 @@ export const Footer: React.FC = () => {
     </footer>
   );
 };
-

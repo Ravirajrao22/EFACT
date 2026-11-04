@@ -38,38 +38,43 @@
   animation: glitchJitter 450ms ease-out;
 }
 
-/* Blueprint Grid Background */
+/* Blueprint Grid Background (Calm 0.04 Opacity) */
 .bg-blueprint {
   background-color: var(--paper);
   background-image: 
-    linear-gradient(to right, rgba(20, 17, 15, 0.06) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(20, 17, 15, 0.06) 1px, transparent 1px);
+    linear-gradient(to right, rgba(20, 17, 15, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20, 17, 15, 0.04) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
 .bg-blueprint-alt {
   background-color: var(--paper-2);
   background-image: 
-    linear-gradient(to right, rgba(20, 17, 15, 0.07) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(20, 17, 15, 0.07) 1px, transparent 1px);
+    linear-gradient(to right, rgba(20, 17, 15, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20, 17, 15, 0.04) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
-/* Neo-brutalist Borders and Shadows */
+/* Neo-brutalist Borders and Shadows (Calmer 4px offset, 6px hover) */
 .border-ink-2 {
   border: 2.5px solid var(--ink);
 }
 
 .shadow-hard {
-  box-shadow: 5px 5px 0 var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+  transition: box-shadow 150ms ease, transform 150ms ease;
+}
+
+.shadow-hard:hover {
+  box-shadow: 6px 6px 0 var(--ink);
 }
 
 .shadow-hard-sm {
-  box-shadow: 3px 3px 0 var(--ink);
+  box-shadow: 2.5px 2.5px 0 var(--ink);
 }
 
 .shadow-hard-lg {
-  box-shadow: 8px 8px 0 var(--ink);
+  box-shadow: 6px 6px 0 var(--ink);
 }
 
 .shadow-hard-xl {
@@ -204,19 +209,4 @@
   }
 }
 
-/* Custom scrollbars for dark simulator panels */
-.dark-scrollbar::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-.dark-scrollbar::-webkit-scrollbar-track {
-  background: #151426;
-}
-.dark-scrollbar::-webkit-scrollbar-thumb {
-  background: #333156;
-  border-radius: 4px;
-}
-.dark-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #4A477B;
-}
 

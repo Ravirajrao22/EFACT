@@ -1,36 +1,52 @@
-# EFACT Studio - Next-Gen K-12 Robotics & Python Learning Platform
+# EFACT Robotics: Practical STEM Education for K-12 Schools
 
-> **"Students don't lack attention. They reject being patronized."**  
-> EFACT Studio is an in-browser robotics simulator and STEM education platform created for school students (Grades 6–12, ages 11–17). It provides a real-time, bidirectional bridge from visual logic blocks to genuine Python 3 code.
+> **"Equipment doesn't make engineers. Thinking does."**  
+> EFACT Robotics partners with K-12 schools and educational institutions to build structured, progressive robotics and coding programmes. We combine proprietary curriculum, dedicated teacher training, hands-on workshop modules, and engineering mentorship in one connected framework.
 
 ---
 
-## 🚀 Key Features
+## 🏫 About The Platform
 
-1. **Interactive In-Browser Robotics Arena (HTML5 Canvas 2D)**:
-   - 10×10 tile grid world with animated top-down rover, responsive DPR scaling, smooth heading and coordinate interpolation.
-   - Dynamic sensors: Ultrasonic distance raycasting cone, optical line sensor, and target docking detection.
-   - Real physics collision response: Bonk shake, squash-and-stretch collision animations, and precise error coordinates.
+EFACT Robotics is designed specifically for school leadership, academic coordinators, and educators seeking to transform their STEM labs from idle hardware storage into hubs of genuine computational thinking.
 
-2. **The "Live Bridge" Blocks-to-Python Engine**:
-   - Visual block palette (Move, Sense, Control, Actions, Logic, Variables).
-   - Bi-directional synchronized highlighting: Hovering a block highlights its exact corresponding Python lines in violet, and vice-versa.
-   - Real Python 3 subset step-by-step interpreter (no external runtime required, supports `for`, `while`, `if/else`, variables, recursion, functions, and robot hardware API).
-   - Infinite loop protection capped at 5,000 steps with humanized error tips.
+### Core Institutional Offerings
+1. **Continuous Curriculum (Grades 6–12)**: 30+ structured sessions per grade level covering algorithmic thinking, embedded electronics, sensory feedback loops, and C++/Python robotics.
+2. **Teacher Empowerment & Training**: Comprehensive educator playbooks, weekly live office hours, and continuous technical upskilling for existing faculty.
+3. **Immersive Workshops & Events**: Multi-day high-energy bootcamps (Autonomous Rovers, Line Tracking, Maze Solving, IoT Weather Stations, Sensor Fusion).
+4. **Structured Progression (User → Maker)**: Moving students systematically from visual logic consumers to independent hardware innovators.
 
-3. **6+ Data-Driven Missions**:
-   - Level 1: **First Steps** (Sequence & timing)
-   - Level 2: **Corner Turner** (Orientation & turning)
-   - Level 3: **Square Dance** (Loops & repetition)
-   - Level 4: **Don't Hit the Wall** (Sensors & `while` conditions)
-   - Level 5: **Star Collector** (Effector manipulation & multi-waypoint navigation)
-   - Level 6: **Line Follower** (Optical track following feedback loop)
-   - Level 7: **Maze Runner** (Autonomous exploration & wall-following algorithms)
+---
 
-4. **Maker's Workbench Visual Identity**:
-   - Playful Neo-Brutalist design language with warm paper background (`#FFF8EC`), blueprint grid lines, 2.5px ink outlines, and hard 5px/8px offset drop shadows.
-   - High-contrast typography: Bricolage Grotesque (headings), DM Sans (body), and JetBrains Mono (code).
-   - Full keyboard accessibility, semantic markup, and `prefers-reduced-motion` compliance.
+## 📸 How to Add Photos & Configure the Gallery
+
+All gallery and hero photos are managed via a centralized image manifest at [`src/data/images.ts`](file:///c:/Users/ravir/OneDrive/Desktop/RIG/src/data/images.ts).
+
+### 1. Recommended Image Specifications
+- **Hero Photos (`hero-a`, `hero-b`, etc.)**: ~1600px wide, 4:3 or 16:9 aspect ratio, JPG or WebP, optimized under 250 KB.
+- **Gallery & In-Action Photos (`workshop-1`, `event-1`, `project-1`, etc.)**: ~1200px wide, 4:3 or 16:9 aspect ratio, JPG or WebP, optimized under 200 KB.
+- **Institutional Validation Photos (`lpu`, `dps`)**: 800–1200px wide, JPG or WebP.
+
+### 2. Adding Image Files
+1. Save your optimized image files in the `public/images/` directory (e.g. `public/images/hero-1.webp`).
+2. Open [`src/data/images.ts`](file:///c:/Users/ravir/OneDrive/Desktop/RIG/src/data/images.ts) and set the `src` field for the corresponding image ID:
+
+```typescript
+export const IMAGES: ImageManifest = {
+  'hero-a': {
+    src: '/images/hero-1.webp', // Point to your file in /public/images/
+    alt: 'Students assembling rover chassis during workshop',
+    caption: 'Grade 8 students wiring ultrasonic sensors'
+  },
+  // ...
+};
+```
+
+### 3. Toggling Placeholder Badges
+When images are pending, the UI displays a clean diagonal-hatch architectural placeholder with a corner badge:
+- To hide the "PLACEHOLDER" corner badges across the site, open [`src/config.ts`](file:///c:/Users/ravir/OneDrive/Desktop/RIG/src/config.ts) and set:
+  ```typescript
+  export const SHOW_PLACEHOLDER_BADGE = false;
+  ```
 
 ---
 
@@ -40,7 +56,7 @@
 - Node.js (v18+)
 - npm or pnpm
 
-### Installation
+### Installation & Run
 
 ```bash
 # Clone the repository
@@ -57,62 +73,30 @@ npm run dev
 ### Production Build
 
 ```bash
-# Compile TypeScript and bundle with Vite
+# Typecheck and compile production bundle
 npm run build
 
-# Preview production build locally
+# Preview build locally
 npm run preview
 ```
 
 ---
 
-## 🧩 How to Add New Missions (`/src/sim/levels.ts`)
+## 🎨 Design System & Accessibility
 
-Missions in EFACT Studio are data-driven. To add a new level, open [`src/sim/levels.ts`](file:///c:/Users/ravir/OneDrive/Desktop/RIG/src/sim/levels.ts) and append a new level definition to the `LEVELS` array:
-
-```typescript
-{
-  id: 8,
-  slug: 'slalom-course',
-  title: 'Slalom Course',
-  subtitle: 'Weave between hazard pillars without hitting obstacles.',
-  whyItMatters: 'Autonomous ground vehicles dynamically recalculate paths around sudden roadblocks.',
-  concepts: ['pathing', 'collision-avoidance', 'sensors'],
-  unlockedCategories: ['move', 'sense', 'control'],
-  start: { x: 1, y: 1, dir: 0 }, // 0: East, 1: South, 2: West, 3: North
-  goal: { x: 8, y: 8 },
-  requiredStars: 0,
-  parBlocks: 8,
-  parSteps: 22,
-  hint: 'Check wall_ahead() and turn before colliding.',
-  starterBlocks: [],
-  grid: (() => {
-    const g = makeEmptyGrid();
-    // Configure 10x10 tile types: 'floor' | 'wall' | 'goal' | 'star' | 'line' | 'start'
-    for (let i = 0; i < 10; i++) {
-      g[0][i] = 'wall';
-      g[9][i] = 'wall';
-      g[i][0] = 'wall';
-      g[i][9] = 'wall';
-    }
-    g[1][1] = 'start';
-    g[8][8] = 'goal';
-    return g;
-  })(),
-}
-```
-
-The simulator will automatically register the mission in the mission dropdown, the curriculum mission board, and calculate unlock progressions.
+- **Palette**: Warm paper canvas (`#FFF8EC`), dense ink borders (`#151426`, 2.5px solid), flat cards with 4px hard offset drop shadows (`shadow-hard`).
+- **Typography**: Bricolage Grotesque (headings), DM Sans (body), JetBrains Mono (labels & metrics).
+- **Accessibility**: Full keyboard navigation (`Tab` / `Shift+Tab` / `Enter`), high contrast ratios (WCAG AAA compliant for primary ink on paper), and reduced-motion respect.
 
 ---
 
-## 🎮 Easter Egg
-Try entering the classic **Konami Code** on your keyboard anywhere on the page:  
-`↑ ↑ ↓ ↓ ← → ← → B A`  
-Watch the robot execute an overdrive turbo spin with a nod of respect printed to your developer console!
+## 📞 Institutional Enquiries & Contact
+
+- **Phone**: +91 83608 38817  
+- **Email**: efactrobotics@gmail.com  
+- **WhatsApp**: Configured directly in `src/config.ts` for instant demo requests.
 
 ---
 
 ## 📄 License & Ownership
-Copyright © 2026 EFACT Robotics Private Limited. All rights reserved.
-
+Copyright © 2026 EFACT Robotics. All rights reserved.

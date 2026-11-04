@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, ArrowUpRight } from 'lucide-react';
+import { Menu, X, ArrowUpRight, Phone } from 'lucide-react';
+import { PHONE_NUMBER } from '../config';
 
 interface NavbarProps {
   activeSection: string;
@@ -18,10 +19,10 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
   }, []);
 
   const navLinks = [
-    { name: 'Playground', href: '#playground' },
-    { name: 'How it works', href: '#how-it-works' },
-    { name: 'Missions', href: '#missions' },
-    { name: 'Maker Path', href: '#maker-path' },
+    { name: 'Why EFACT', href: '#why' },
+    { name: 'What we bring', href: '#offerings' },
+    { name: 'In action', href: '#in-action' },
+    { name: 'Programme', href: '#programme' },
     { name: 'For Schools', href: '#schools' },
   ];
 
@@ -41,7 +42,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
         <a
           href="#"
           className="flex items-center gap-3 group select-none"
-          aria-label="EFACT Studio Home"
+          aria-label="EFACT Robotics Home"
         >
           <div className="w-10 h-10 rounded-xl bg-white border-ink-2 shadow-hard-sm flex items-center justify-center p-0.5 overflow-hidden group-hover:scale-105 transition-transform">
             <img
@@ -55,7 +56,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
               EFACT
             </span>
             <span className="font-mono text-[10px] font-bold tracking-widest text-ink-soft">
-              STUDIO
+              ROBOTICS
             </span>
           </div>
         </a>
@@ -72,16 +73,16 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
                   e.preventDefault();
                   handleLinkClick(link.href);
                 }}
-                className={`relative font-body font-semibold text-base text-ink transition-colors group py-1 ${isActive ? 'text-ink font-bold' : 'hover:text-blue'
-                  }`}
+                className={`relative font-body font-semibold text-base text-ink transition-colors group py-1 ${
+                  isActive ? 'text-ink font-bold' : 'hover:text-blue'
+                }`}
               >
                 {link.name}
-                {/* Marker underline on active / hover */}
+                {/* Active Indicator Underline */}
                 <span
-                  className={`absolute left-0 bottom-0 w-full h-[4px] rounded-full transition-all duration-200 ${isActive
-                      ? 'bg-lime'
-                      : 'bg-yellow scale-x-0 group-hover:scale-x-100'
-                    }`}
+                  className={`absolute left-0 bottom-0 w-full h-[3px] rounded-full transition-all duration-200 ${
+                    isActive ? 'bg-lime' : 'bg-blue scale-x-0 group-hover:scale-x-100'
+                  }`}
                 />
               </a>
             );
@@ -90,21 +91,11 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
 
         {/* Right CTA */}
         <div className="hidden sm:flex items-center gap-4">
-          <a
-            href="#schools"
-            onClick={(e) => {
-              e.preventDefault();
-              handleLinkClick('#schools');
-            }}
-            className="font-body text-sm font-semibold text-ink-soft hover:text-ink hover:underline"
-          >
-            Teachers
-          </a>
           <button
-            onClick={() => handleLinkClick('#playground')}
-            className="px-5 py-2.5 rounded-full bg-blue text-white font-body font-bold text-sm btn-brutal flex items-center gap-1.5"
+            onClick={() => handleLinkClick('#schools')}
+            className="px-5 py-2.5 rounded-full bg-blue text-white font-body font-bold text-sm btn-brutal flex items-center gap-1.5 shadow-hard-sm hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
           >
-            <span>Launch Playground</span>
+            <span>Request a School Demo</span>
             <ArrowUpRight className="w-4 h-4" />
           </button>
         </div>
@@ -124,9 +115,9 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
         <div
           role="dialog"
           aria-modal="true"
-          className="lg:hidden fixed inset-x-0 top-[72px] bottom-0 bg-paper z-40 border-t-ink-2 p-6 flex flex-col justify-between overflow-y-auto animate-fadeIn"
+          className="lg:hidden fixed inset-x-0 top-[72px] bottom-0 bg-paper z-40 border-t-ink-2 p-6 flex flex-col justify-between overflow-y-auto"
         >
-          <div className="flex flex-col gap-6 pt-4">
+          <div className="flex flex-col gap-5 pt-4">
             {navLinks.map((link) => (
               <a
                 key={link.name}
@@ -135,7 +126,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
                   e.preventDefault();
                   handleLinkClick(link.href);
                 }}
-                className="font-heading font-extrabold text-3xl text-ink hover:text-blue py-1 border-b border-ink/10 flex items-center justify-between"
+                className="font-heading font-extrabold text-2xl text-ink hover:text-blue py-2 border-b border-ink/10 flex items-center justify-between"
               >
                 <span>{link.name}</span>
                 <span className="font-mono text-xs text-ink-soft">→</span>
@@ -143,23 +134,27 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
             ))}
           </div>
 
-          <div className="pt-8 flex flex-col gap-3">
-            <button
-              onClick={() => handleLinkClick('#playground')}
-              className="w-full py-4 rounded-full bg-blue text-white font-heading font-extrabold text-lg btn-brutal text-center"
-            >
-              Launch Playground (Free)
-            </button>
+          <div className="pt-8 flex flex-col gap-4">
             <button
               onClick={() => handleLinkClick('#schools')}
-              className="w-full py-3 rounded-full bg-paper border-ink-2 font-mono text-sm font-bold text-ink text-center"
+              className="w-full py-3.5 rounded-full bg-blue text-white font-heading font-extrabold text-base btn-brutal text-center"
             >
-              For Schools & Curriculum Info
+              Request a School Demo
             </button>
+
+            {/* Mobile Sheet Footer Phone Link */}
+            <div className="text-center pt-2">
+              <a
+                href={`tel:${PHONE_NUMBER.replace(/\s+/g, '')}`}
+                className="inline-flex items-center gap-1.5 font-mono text-xs text-ink-soft hover:text-ink font-semibold"
+              >
+                <Phone className="w-3.5 h-3.5 text-blue" />
+                <span>Call our team: {PHONE_NUMBER}</span>
+              </a>
+            </div>
           </div>
         </div>
       )}
     </header>
   );
 };
-
